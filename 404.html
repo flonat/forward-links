@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Redirecting…</title>
+<script>
+(async () => {
+  // Load the central map
+  const map = await fetch("/forward-links/links.json")
+    .then(r => r.ok ? r.json() : {});
+
+  // Determine the slug: either from “/slug” path or ?r=slug
+  const url  = new URL(location);
+  const path = url.pathname.replace(/\/+$/, "");
+  const slug = url.searchParams.get("r")
+             || path.split("/").pop();
+
+  // Redirect if found, else show error
+  if (map[slug]) {
+    window.location.replace(map[slug]);
+  } else {
+    document.body.style.fontFamily = "sans-serif";
+    document.body.innerHTML = `
+      <h1>Unknown link: “${slug}”</h1>
+      <p>Available keys: ${Object.keys(map).join(", ")}</p>`;
+  }
+})();
+</script>
